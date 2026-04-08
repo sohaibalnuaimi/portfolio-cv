@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Admin | Portfolio Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#08080d;color:#e2e8f0;min-height:100vh}
+
+        /* Login */
+        #login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at top,#12122a 0%,#08080d 70%)}
+        .login-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:48px;width:420px;backdrop-filter:blur(20px);box-shadow:0 25px 50px rgba(0,0,0,0.5)}
+        .login-box h1{font-size:24px;font-weight:700;margin-bottom:8px}
+        .login-box p{color:#64748b;font-size:14px;margin-bottom:28px}
+        .login-box input{width:100%;padding:14px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-size:15px;outline:none;margin-bottom:16px;transition:border .3s}
+        .login-box input:focus{border-color:#8b5cf6}
+        .login-box button{width:100%;padding:14px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border:none;border-radius:12px;color:#fff;font-weight:600;font-size:15px;cursor:pointer;transition:all .2s}
+        .login-box button:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(139,92,246,0.3)}
+        .login-err{color:#f87171;font-size:13px;margin-bottom:10px;display:none}
+
+        /* Dashboard */
+        #dash{display:none}
+        .top-bar{background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.06);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+        .top-bar h1{font-size:17px;font-weight:600}
+        .top-bar h1 span{color:#8b5cf6}
+        .top-actions{display:flex;gap:10px}
+        .btn{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:'Inter',sans-serif}
+        .btn-p{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff}
+        .btn-p:hover{box-shadow:0 6px 20px rgba(139,92,246,0.3);transform:translateY(-1px)}
+        .btn-s{background:rgba(255,255,255,0.06);color:#e2e8f0;border:1px solid rgba(255,255,255,0.1)}
+        .btn-s:hover{background:rgba(255,255,255,0.1)}
+        .btn-d{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+
+        .layout{display:flex;min-height:calc(100vh - 56px)}
+        .side{width:220px;background:rgba(255,255,255,0.02);border-right:1px solid rgba(255,255,255,0.06);padding:20px 14px;flex-shrink:0}
+        .side-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#64748b;margin-bottom:10px;padding:0 10px}
+        .side-link{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;color:#94a3b8;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:3px;transition:all .2s}
+        .side-link:hover{background:rgba(255,255,255,0.05);color:#e2e8f0}
+        .side-link.on{background:rgba(139,92,246,0.12);color:#a78bfa}
+
+        .main{flex:1;padding:28px;max-width:880px}
+        .stitle{font-size:20px;font-weight:700;margin-bottom:4px}
+        .sdesc{color:#64748b;font-size:13px;margin-bottom:24px}
+
+        .fg{margin-bottom:18px}
+        .fg label{display:block;font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+        .fg input,.fg textarea{width:100%;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#e2e8f0;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border .3s}
+        .fg input:focus,.fg textarea:focus{border-color:#8b5cf6}
+        .fg textarea{min-height:90px;resize:vertical;line-height:1.6}
+        .fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+        .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px;margin-bottom:14px;transition:border .3s}
+        .card:hover{border-color:rgba(255,255,255,0.15)}
+        .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+        .card-num{font-size:11px;font-weight:700;color:#a78bfa;background:rgba(139,92,246,0.12);padding:3px 10px;border-radius:16px}
+        .rm-btn{background:none;border:none;color:#64748b;cursor:pointer;padding:5px;border-radius:8px;font-size:16px;transition:all .2s}
+        .rm-btn:hover{color:#f87171;background:rgba(239,68,68,0.1)}
+        .add-btn{width:100%;padding:12px;background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.1);border-radius:14px;color:#64748b;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+        .add-btn:hover{border-color:#8b5cf6;color:#a78bfa;background:rgba(139,92,246,0.05)}
+
+        .tag-input{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;min-height:44px;cursor:text}
+        .tag{background:rgba(139,92,246,0.15);color:#a78bfa;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+        .tag button{background:none;border:none;color:#a78bfa;cursor:pointer;font-size:14px}
+        .tag-input input{background:none;border:none;color:#e2e8f0;font-size:13px;outline:none;flex:1;min-width:80px;font-family:'Inter',sans-serif}
+
+        .pnl{display:none}.pnl.on{display:block}
+        .toast{position:fixed;bottom:28px;right:28px;background:#065f46;color:#a7f3d0;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 10px 40px rgba(0,0,0,0.4);transform:translateY(100px);opacity:0;transition:all .4s;z-index:999}
+        .toast.show{transform:translateY(0);opacity:1}
+        .preview-link{display:inline-block;margin-top:16px;color:#8b5cf6;font-size:13px;text-decoration:none;font-weight:500}
+        .preview-link:hover{text-decoration:underline}
+    </style>
+</head>
+<body>
+
+<div id="login">
+    <div class="login-box">
+        <h1>🌐 Site Admin</h1>
+        <p>Control your portfolio website content.</p>
+        <div class="login-err" id="lerr">Incorrect password.</div>
+        <input type="password" id="lpw" placeholder="Enter password..." onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="doLogin()">Sign In</button>
+    </div>
+</div>
+
+<div id="dash">
+    <div class="top-bar">
+        <h1>🌐 Site <span>Control Panel</span></h1>
+        <div class="top-actions">
+            <a href="index.html" target="_blank" class="btn btn-s">🔗 View Site</a>
+            <a href="admin.html" class="btn btn-s">📄 CV Editor</a>
+            <button class="btn btn-p" onclick="saveAll()">💾 Save & Apply</button>
+        </div>
+    </div>
+    <div class="layout">
+        <nav class="side">
+            <div class="side-label">Website Sections</div>
+            <div class="side-link on" onclick="sw('hero',this)">🏠 Hero</div>
+            <div class="side-link" onclick="sw('about',this)">👤 About</div>
+            <div class="side-link" onclick="sw('exp',this)">💼 Experience</div>
+            <div class="side-link" onclick="sw('proj',this)">🚀 Projects</div>
+            <div class="side-link" onclick="sw('skills',this)">⚡ Skills</div>
+            <div class="side-link" onclick="sw('social',this)">🔗 Social Links</div>
+            <div class="side-link" onclick="sw('sett',this)">⚙️ Settings</div>
+        </nav>
+        <div class="main">
+
+            <!-- Hero -->
+            <div class="pnl on" id="p-hero">
+                <h2 class="stitle">Hero Section</h2>
+                <p class="sdesc">The first thing visitors see on your portfolio.</p>
+                <div class="fg"><label>Full Name</label><input id="h-name"></div>
+                <div class="fg"><label>Subtitle</label><input id="h-sub" placeholder="Artificial Intelligence & Computer Science"></div>
+                <div class="fg"><label>Bio Paragraph</label><textarea id="h-bio" rows="4"></textarea></div>
+                <div class="fg"><label>Status Badge</label><input id="h-badge" placeholder="AVAILABLE FOR WORK"></div>
+            </div>
+
+            <!-- About -->
+            <div class="pnl" id="p-about">
+                <h2 class="stitle">About Section</h2>
+                <p class="sdesc">Tell visitors more about yourself.</p>
+                <div class="fg"><label>About Title</label><input id="a-title" placeholder="The Whole Story"></div>
+                <div class="fg"><label>Paragraph 1</label><textarea id="a-p1" rows="4"></textarea></div>
+                <div class="fg"><label>Paragraph 2</label><textarea id="a-p2" rows="4"></textarea></div>
+            </div>
+
+            <!-- Experience -->
+            <div class="pnl" id="p-exp">
+                <h2 class="stitle">Experience</h2>
+                <p class="sdesc">Your professional experience timeline.</p>
+                <div id="exp-list"></div>
+                <button class="add-btn" onclick="addExp()">+ Add Experience</button>
+            </div>
+
+            <!-- Projects -->
+            <div class="pnl" id="p-proj">
+                <h2 class="stitle">Featured Projects</h2>
+                <p class="sdesc">Showcase your best work.</p>
+                <div id="proj-list"></div>
+                <button class="add-btn" onclick="addProj()">+ Add Project</button>
+            </div>
+
+            <!-- Skills -->
+            <div class="pnl" id="p-skills">
+                <h2 class="stitle">Skills Section</h2>
+                <p class="sdesc">Your technical arsenal displayed on the website.</p>
+                <div class="fg"><label>Languages (comma-separated)</label><input id="sk-lang" placeholder="Python, Java, JavaScript, SQL, HTML/CSS"></div>
+                <div class="fg"><label>AI & Frameworks (comma-separated)</label><input id="sk-ai" placeholder="MediaPipe, OpenCV, LLMs, Node.js"></div>
+                <div class="fg"><label>Tools & Platforms (comma-separated)</label><input id="sk-tools" placeholder="Git / GitHub, Android Studio, Oracle DB, VS Code"></div>
+            </div>
+
+            <!-- Social -->
+            <div class="pnl" id="p-social">
+                <h2 class="stitle">Social Links</h2>
+                <p class="sdesc">Your social media and professional links.</p>
+                <div class="fg"><label>GitHub URL</label><input id="s-github"></div>
+                <div class="fg"><label>LinkedIn URL</label><input id="s-linkedin"></div>
+                <div class="fg"><label>X (Twitter) URL</label><input id="s-twitter"></div>
+                <div class="fg"><label>Email</label><input id="s-email"></div>
+            </div>
+
+            <!-- Settings -->
+            <div class="pnl" id="p-sett">
+                <h2 class="stitle">Settings</h2>
+                <p class="sdesc">Admin password and data management.</p>
+                <div class="fg"><label>New Password</label><input type="password" id="s-pw1" placeholder="New password..."></div>
+                <div class="fg"><label>Confirm</label><input type="password" id="s-pw2" placeholder="Confirm..."></div>
+                <button class="btn btn-p" onclick="chPw()" style="margin-bottom:28px">Update Password</button>
+                <hr style="border-color:rgba(255,255,255,0.06);margin-bottom:20px">
+                <button class="btn btn-d" onclick="if(confirm('Reset all site data to defaults?')){localStorage.removeItem('site_data');loadDef();toast('Reset to defaults')}">🗑 Reset All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script>
+const DEF = {
+    hero: { name:"Sohaib Derhem Naji Alnuaimi", sub:"Artificial Intelligence & Computer Science", bio:"I am a Computer Science student majoring in Artificial Intelligence at the University of Malaya. From developing mobile applications in Java to building Python-driven AI prototypes, I focus on creating high-performance, human-centered digital experiences.", badge:"AVAILABLE FOR WORK" },
+    about: { title:"The Whole Story", p1:"", p2:"" },
+    experience: [],
+    projects: [
+        { title:"SULAM AI Chatbot", desc:"Integrated AI chatbot with robust backend infrastructure to automate student queries and streamline campus services.", tags:["Python","AI","Backend"], github:"", gradient:"from-brand-900 to-gray-900" },
+        { title:"Mobile Mood Tracker", desc:"A fully functional mobile application enabling users to log and track emotional well-being with custom graphing.", tags:["Java","Android Studio","Firebase"], github:"", gradient:"from-accent-600/40 to-gray-900" },
+        { title:"Carbon Footprint System", desc:"Complete architectural system flow for an environmental sustainability management tool with ERD data modeling.", tags:["System Analysis","ERD","Design"], github:"", gradient:"from-blue-900 to-gray-900" },
+        { title:"Edge Browser Extension", desc:"Functional browser extension enhancing daily user web browsing with seamless productivity features.", tags:["JavaScript","DOM","Chrome APIs"], github:"", gradient:"from-brand-900 to-gray-900" },
+        { title:"Sign Language Translator", desc:"Real-time ASL alphabet translator using Python and MediaPipe for hand landmark detection from live webcam.", tags:["Python","MediaPipe","OpenCV"], github:"https://github.com/sohaibalnuaimi/Sign-Language-Translator", gradient:"from-accent-600/40 to-gray-900" },
+        { title:"AI Camera System", desc:"Intelligent camera system for advanced real-time video processing and automated image recognition.", tags:["Python","Computer Vision","AI"], github:"https://github.com/sohaibalnuaimi/Ai-cam-project", gradient:"from-blue-900 to-gray-900" }
+    ],
+    skills: { lang:"Python, Java, JavaScript, SQL, HTML/CSS", ai:"MediaPipe, OpenCV, LLMs, Node.js", tools:"Git / GitHub, Android Studio, Oracle DB, VS Code" },
+    social: { github:"https://github.com/sohaibalnuaimi", linkedin:"https://www.linkedin.com/in/sohaib-alnuaimi-441841369/", twitter:"https://x.com/sohaibnuaimi", email:"sohaibnuaimi@gmail.com" }
+};
+
+let D = {};
+const PW_KEY = 'site_admin_pass';
+const DEFAULT_PW = 'sohaib2025';
+
+function doLogin(){
+    const pw = document.getElementById('lpw').value;
+    if(pw === (localStorage.getItem(PW_KEY)||DEFAULT_PW)){
+        document.getElementById('login').style.display='none';
+        document.getElementById('dash').style.display='block';
+        load();
+    } else { document.getElementById('lerr').style.display='block'; }
+}
+function chPw(){
+    const a=document.getElementById('s-pw1').value, b=document.getElementById('s-pw2').value;
+    if(!a)return; if(a!==b){toast('Passwords don\'t match!');return;}
+    localStorage.setItem(PW_KEY,a); toast('Password updated!');
+    document.getElementById('s-pw1').value=''; document.getElementById('s-pw2').value='';
+}
+function sw(id,el){
+    document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+    document.querySelectorAll('.side-link').forEach(l=>l.classList.remove('on'));
+    document.getElementById('p-'+id).classList.add('on'); el.classList.add('on');
+}
+
+function load(){
+    const s=localStorage.getItem('site_data');
+    D=s?JSON.parse(s):JSON.parse(JSON.stringify(DEF));
+    if(!D.about) D.about={title:'',p1:'',p2:''};
+    if(!D.experience) D.experience=[];
+    fill();
+}
+function loadDef(){ D=JSON.parse(JSON.stringify(DEF)); fill(); }
+function fill(){
+    document.getElementById('h-name').value=D.hero.name||'';
+    document.getElementById('h-sub').value=D.hero.sub||'';
+    document.getElementById('h-bio').value=D.hero.bio||'';
+    document.getElementById('h-badge').value=D.hero.badge||'';
+    document.getElementById('a-title').value=D.about.title||'';
+    document.getElementById('a-p1').value=D.about.p1||'';
+    document.getElementById('a-p2').value=D.about.p2||'';
+    document.getElementById('sk-lang').value=D.skills.lang||'';
+    document.getElementById('sk-ai').value=D.skills.ai||'';
+    document.getElementById('sk-tools').value=D.skills.tools||'';
+    document.getElementById('s-github').value=D.social.github||'';
+    document.getElementById('s-linkedin').value=D.social.linkedin||'';
+    document.getElementById('s-twitter').value=D.social.twitter||'';
+    document.getElementById('s-email').value=D.social.email||'';
+    renderExp(); renderProj();
+}
+function collect(){
+    D.hero={name:gv('h-name'),sub:gv('h-sub'),bio:gv('h-bio'),badge:gv('h-badge')};
+    D.about={title:gv('a-title'),p1:gv('a-p1'),p2:gv('a-p2')};
+    D.skills={lang:gv('sk-lang'),ai:gv('sk-ai'),tools:gv('sk-tools')};
+    D.social={github:gv('s-github'),linkedin:gv('s-linkedin'),twitter:gv('s-twitter'),email:gv('s-email')};
+    collectExp(); collectProj();
+}
+function gv(id){return document.getElementById(id).value}
+function saveAll(){ collect(); localStorage.setItem('site_data',JSON.stringify(D)); toast('✅ Saved! Refresh your portfolio to see changes.'); }
+
+// Experience
+function renderExp(){
+    const c=document.getElementById('exp-list'); c.innerHTML='';
+    D.experience.forEach((e,i)=>{
+        c.innerHTML+=`<div class="card" data-i="${i}">
+            <div class="card-top"><span class="card-num">EXP ${i+1}</span><button class="rm-btn" onclick="rmExp(${i})">✕</button></div>
+            <div class="fr"><div class="fg"><label>Title</label><input class="e-title" value="${esc(e.title)}"></div><div class="fg"><label>Period</label><input class="e-period" value="${esc(e.period)}"></div></div>
+            <div class="fr"><div class="fg"><label>Company</label><input class="e-company" value="${esc(e.company)}"></div><div class="fg"><label>Location</label><input class="e-loc" value="${esc(e.location)}"></div></div>
+            <div class="fg"><label>Description</label><textarea class="e-desc" rows="3">${esc(e.desc)}</textarea></div>
+        </div>`;
+    });
+}
+function collectExp(){
+    D.experience=[];
+    document.querySelectorAll('#exp-list .card').forEach(c=>{
+        D.experience.push({title:c.querySelector('.e-title').value,period:c.querySelector('.e-period').value,company:c.querySelector('.e-company').value,location:c.querySelector('.e-loc').value,desc:c.querySelector('.e-desc').value});
+    });
+}
+function addExp(){collectExp();D.experience.push({title:'',period:'',company:'',location:'',desc:''});renderExp();}
+function rmExp(i){collectExp();D.experience.splice(i,1);renderExp();}
+
+// Projects
+function renderProj(){
+    const c=document.getElementById('proj-list'); c.innerHTML='';
+    D.projects.forEach((p,i)=>{
+        c.innerHTML+=`<div class="card" data-i="${i}">
+            <div class="card-top"><span class="card-num">PROJECT ${i+1}</span><button class="rm-btn" onclick="rmProj(${i})">✕</button></div>
+            <div class="fr"><div class="fg"><label>Title</label><input class="p-title" value="${esc(p.title)}"></div><div class="fg"><label>GitHub URL</label><input class="p-github" value="${esc(p.github)}"></div></div>
+            <div class="fg"><label>Description</label><textarea class="p-desc" rows="3">${esc(p.desc)}</textarea></div>
+            <div class="fg"><label>Tags (comma-separated)</label><input class="p-tags" value="${esc((p.tags||[]).join(', '))}"></div>
+        </div>`;
+    });
+}
+function collectProj(){
+    D.projects=[];
+    document.querySelectorAll('#proj-list .card').forEach(c=>{
+        D.projects.push({title:c.querySelector('.p-title').value,github:c.querySelector('.p-github').value,desc:c.querySelector('.p-desc').value,tags:c.querySelector('.p-tags').value.split(',').map(t=>t.trim()).filter(Boolean)});
+    });
+}
+function addProj(){collectProj();D.projects.push({title:'',desc:'',tags:[],github:''});renderProj();}
+function rmProj(i){collectProj();D.projects.splice(i,1);renderProj();}
+
+function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function toast(m){const t=document.getElementById('toast-el');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+</script>
+</body>
+</html>

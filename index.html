@@ -230,15 +230,15 @@
                     <h1
                         class="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-extrabold leading-[1.05] tracking-tight mb-6">
                         Hi, I'm <br />
-                        <span class="reveal-text block mt-1">Sohaib Derhem Naji Alnuaimi.</span>
+                        <span class="reveal-text block mt-1" data-site="hero-name">Sohaib Derhem Naji Alnuaimi.</span>
                     </h1>
 
                     <h2
-                        class="text-xl sm:text-2xl text-gray-300 font-medium mb-6 max-w-xl leading-relaxed font-heading">
+                        class="text-xl sm:text-2xl text-gray-300 font-medium mb-6 max-w-xl leading-relaxed font-heading" data-site="hero-sub">
                         Artificial Intelligence & Computer Science
                     </h2>
 
-                    <p class="text-base sm:text-lg text-gray-400 mb-10 max-w-lg leading-relaxed font-light">
+                    <p class="text-base sm:text-lg text-gray-400 mb-10 max-w-lg leading-relaxed font-light" data-site="hero-bio">
                         I am a Computer Science student majoring in Artificial Intelligence at the University of
                         Malaya. From developing mobile applications in Java to building Python-driven AI prototypes,
                         I focus on creating high-performance, human-centered digital experiences.
@@ -1153,6 +1153,35 @@
                 });
             });
         });
+    </script>
+
+    <!-- Dynamic Site Content from Admin Dashboard -->
+    <script>
+        (function(){
+            const raw = localStorage.getItem('site_data');
+            if (!raw) return;
+            try {
+                const S = JSON.parse(raw);
+                // Hero
+                if (S.hero) {
+                    const nameEl = document.querySelector('[data-site="hero-name"]');
+                    const subEl = document.querySelector('[data-site="hero-sub"]');
+                    const bioEl = document.querySelector('[data-site="hero-bio"]');
+                    if (nameEl && S.hero.name) nameEl.textContent = S.hero.name + '.';
+                    if (subEl && S.hero.sub) subEl.textContent = S.hero.sub;
+                    if (bioEl && S.hero.bio) bioEl.textContent = S.hero.bio;
+                }
+                // Social links
+                if (S.social) {
+                    const gh = document.querySelector('a[href*="github.com"]');
+                    const li = document.querySelector('a[href*="linkedin.com"]');
+                    const tw = document.querySelector('a[href*="x.com"]');
+                    if (gh && S.social.github) gh.href = S.social.github;
+                    if (li && S.social.linkedin) li.href = S.social.linkedin;
+                    if (tw && S.social.twitter) tw.href = S.social.twitter;
+                }
+            } catch(e) { console.error('Site data parse error:', e); }
+        })();
     </script>
 </body>
 
